@@ -1,0 +1,197 @@
+.Jugadores{
+    color: white;
+    text-align: center;
+    margin-top: 1%;    
+    margin-bottom: 3%;    
+    font: oblique bold 320% cursive;    
+    width: 80%;
+    border-radius: 20px;
+    margin-left: 10%;    
+}
+
+.TitulosForm{
+    color: white;
+    text-align: center;
+    margin-top: 1%;    
+    margin-bottom: 3%;    
+    font: oblique bold 320% cursive;        
+    border-radius: 20px;    
+    width: 96%;
+}
+
+/* IMAGENES FONDOS DE PANTALLA */
+.Contenido_Principal{
+    background-image: url(Fondo1.jpg);
+}
+.ReduccionDimen{
+    background-image: url(Fondo2.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.Entrenamiento{
+    background-image: url(Fondo3.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.SitemaMonitoreoFront{
+    background-image: url(Fondo4.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.Texto1{
+    color: white;
+    font: oblique bold 100% arial; 
+    margin-left: 2%;
+    text-align: justify;
+}
+
+.Texto3{
+    color: white;
+    width: 50px; 
+    margin-left: 2%;
+}
+
+.InfoEntreAlgo{
+    padding: 0 150px; 
+    margin-bottom: 30px;
+    display: flex;
+}
+
+
+
+.Texto_Entrenamiento{
+    color: white;
+    text-align: center;
+    margin-top: 1%;    
+    margin-bottom: 3%;    
+    font: oblique bold 320% cursive;    
+    width: 80%;
+    border-radius: 20px;
+    margin-left: 10%;  
+}
+
+
+.d-block{
+height: 400px;
+}
+.card-img-top{
+    max-height: 30%;
+}
+.card-text{
+    text-align: justify;
+}
+.card{
+ margin-right: 1%;
+ margin-left: 8%;
+}
+
+
+/* ENTRADA JUGADORES */
+.Jugador{
+    width: 50%;
+    margin-left: 25%;
+}
+
+.Partidas{
+    color: aquamarine;
+    text-align: center;
+    font: oblique bold 220% cursive;    
+}
+
+.Tabla1{
+    margin-left: 15%;
+    width: 70%;
+    text-align: center;
+}
+
+/* LINEA */
+hr {
+    border: none;
+    border-top: 3px solid white; 
+    height: 0;
+    width: 90%;
+    margin-left: 5%;
+}
+
+
+/* PIE DE PAGINA */
+.footer {
+    background-color: #343a40; /* Color de fondo oscuro */
+    color: #ffffff; /* Color del texto blanco */
+    padding: 20px 0; /* Espaciado */
+}
+.footer a {
+    color: #ffffff; /* Color del texto de los enlaces */
+}
+
+/*LOUDER*/
+.hidden {
+    display: none !important;
+}
+
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+    color: white;
+    font-size: 20px;
+}
+
+#loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* Modal styles */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+

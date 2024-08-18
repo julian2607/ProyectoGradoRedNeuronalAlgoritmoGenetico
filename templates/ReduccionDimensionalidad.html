@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Red Neuronal Algoritmo genetico</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="../static/estilos.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+
+  <!--NAVRA-->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Reduccion de dimensionalidad </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="http://127.0.0.1:5000/SistemaMonitoreo">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="http://127.0.0.1:5000/ReduccionDimensionalidad">Reducción.D</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://127.0.0.1:5000/Entrenamiento">Entrenamiento</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://127.0.0.1:5000/EjecutarModeloDato">Ejecutar</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Opciones
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Descargar PDF</a></li>
+              <li><a class="dropdown-item" href="#">Referencias</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Carrusel -->
+  <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active"
+        aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
+        aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
+        aria-label="Slide 3"></button>
+      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3"
+        aria-label="Slide 4"></button>
+    </div>
+
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="../static/Imagenes/Imagen1.jpg" class="d-block w-100" alt="...">
+        <div class="carousel-caption d-none d-md-block">
+          <h5> Mass Effect</h5>
+          <p>“Las elecciones que hacemos definen quiénes somos.”</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="../static/Imagenes/Imagen2.jpg" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img src="../static/Imagenes/Imagen3.jpeg" class="d-block w-100" alt="...">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Bioshock</h5>
+          <p>“Un hombre elige; un esclavo obedece.”</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="../static/Imagenes/Imagen4.jpg" class="d-block w-100" alt="...">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Assassins Creed 3</h5>
+          <p>No puedes cambiar el pasado, pero puedes cambiar el futuro.” </p>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+      data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+      data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <div class="ReduccionDimen">
+    <br>
+    <div>
+      <h1 class="Jugadores" style="background-color: aqua;">Conjunto de datos (Pre-Procesamiento)</h1>
+      <div>
+        <h5 style="text-align: center; color: white; font-size: 30px; font-weight: 600;">Formulario para Colocar la
+          ubicación del archivo</h5>
+        <br>
+        <form id="RealizarPreProcesamiento">
+          <div class="Jugador">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="UrlDatasetPre" placeholder="Ubicacion Equipo DataSet"
+                name="UrlDatasetPre">
+              <label for="floatingInput">Ubicación del conjunto de datos en PC</label>
+              <br>
+              <button type="submit" class="btn btn-success" id="PreProcesamiento"
+                style="width: 250px; margin-left: 30%;" onclick="">
+                Analizar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!--LOUDER-->
+      <div class="hidden" id="loadingScreen">
+        <div id="loader"></div>
+        <p>Cargando...</p>
+      </div>
+
+      <!-- Modal MESANJE RECIBIDO  -->
+      <div id="myModal" class="modal hidden">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h1 style="font-family: Roboto, sans-serif;color: #69fd08;">Información del Servidor</h2>
+            <p id="modalMessage"></p>
+            <button type="button" class="btn btn-success" id="closeModalButton">Aceptar</button>
+        </div>
+      </div>
+
+      <br>
+      <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+        Poder entender cómo está compuesto el conjunto de datos que se va a trabajar es sumamente
+        importante para el desarrollo del modelo, por lo tanto, hay que determinar cuál es la
+        distribución de los datos, cuáles son los componentes que más información aportan y de
+        cuáles se puede prescindir. Para ello, a continuación, se encontrará información relevante
+        del conjunto de datos. Por ejemplo, están distribuidos los datos y la matriz de correlación
+        de las diferentes características del modelo mediante un mapa de calor. A continuación,
+        podemos observar la cantidad de muestras que tiene cada tipo de ataque en el conjunto de
+        datos y su respectivo porcentaje del mismo del dataset estudiado los cuales fueron
+        procesados mediante Google Colab.
+      </h5>
+      <br>
+
+      <!-- IMAGENES DATASET -->
+      <div style="margin-left: 10%; display: flex;">
+        <img src="../static/Imagenes/DistribucionDatos.png" style="height: 45%; width: 40%;">
+        <img src="../static\Imagenes\PorcentajeDatos.jpg"
+          style="height: 50%; width: 45%; margin-top: 3%; margin-left: 3%;">
+      </div>
+      <!-- linea horizontal -->
+      <hr><br>
+      <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+        Por otra parte, tenemos los resultados del dataset a analizar obteniendo los siguientes resultados:
+      </h5>
+      <br>
+
+      <!-- IMAGENES CODGIO-->
+      <div style="margin-left: 10%; display: flex;">
+        <img src="../static/ImagenesProcesadas/CaracteristicasImport2.png" style="height: 55%; width: 40%;">
+        <img src="../static/ImagenesProcesadas/Porcentaje_Ataques.png"
+          style="height: 50%; width: 45%; margin-left: 3%;">
+      </div>
+    </div>
+    <br>
+
+    <!-- linea horizontal -->
+    <hr><br>
+
+    <div style="text-align: center;">
+      <h3 class="Jugadores" style="background-color: #5cc400; font-size: 40px; font-weight: 600;">
+        Importancia de los datos(Normalización)
+      </h3>
+      <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+        Otro aspecto para el preprocesamiento de los datos es poder determinar cuáles
+        son las columnas que mayor información aportan al dataset que, en este caso,
+        se implementó un modelo de Random Forest para evaluar la importancia de las
+        características. La salida de este modelo es un gráfico de barras que está
+        normalizado, donde entre más cerca este el valor de cada columna a 1 nos
+        indicará que aporta mayor información. A partir de este gráfico podemos
+        determinar cuáles columnas podemos usar para o son más viables para el
+        entrenamiento y evaluación del modelo.
+      </h5>
+      <br>
+      <img src="../static/Imagenes/CaracteristicasImport.png" style="height: 60%; width: 50%;">
+    </div>
+
+    <br>
+    <hr><br>
+
+    <div style="text-align: center;">
+      <h3 class="Jugadores" style="background-color: #6f5ae3; font-size: 40px; font-weight: 600;">
+        Importancia Caracteristicas con variable Objetivo
+      </h3>
+      <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+        Otra forma de poder determinar cuáles son las características más
+        importantes para entrenar el modelo de red neuronal es mediante la
+        función “mutual_info_classif” de la librería scikit-learn que calcula
+        la información mutua entre las características y la variable objetivo
+        o label. Esta librería asocia que entre mas alta sea la información
+        mutua aportarán mayor información, donde las de menor información mutua
+        podrán ser descartadas. Además de esta función existen otras como son
+        la “SelectKBest”,” RFE”, etc.
+      </h5>
+      <br>
+      <img src="../static/Imagenes/ImportaciaCaractDatos.png" style="height: 50%; width: 50%;">
+      <!-- LINEA hORIZONTAL -->
+      <br>
+      <hr><br>
+      <img src="../static/ImagenesProcesadas/ImportaciaCaractDatos.png" style="height: 50%; width: 50%;">
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div style="text-align: center;">
+      <h3 class="Jugadores" style="background-color: #003ec4; font-size: 40px; font-weight: 600;">
+        Matriz Correlacion Datos Data-Set
+      </h3>
+      <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+        La correlación es un parámetro que mide la relación entre las características de sus datos
+        variando entre -1 a 1 considerándose que tienen una correlación positiva perfecta si su
+        valor es igual a 1 moviéndose de forma simultanea en el tiempo. Por otra parte, si la
+        correlación es de 0 se considera que los datos no están correlacionados teniendo un
+        comportamiento aleatorio. Por ejemplo, entre mayor sea la temperatura y la necesidad del
+        aire acondicionado aumente será positivamente correlacionados, pero si es lo inverso, es
+        decir, entre mayor la temperatura menor el uso del aire será negativamente correlacionado.
+      </h5>
+      <br>
+      <img src="..\static\Imagenes\MatrizCorrelacion2.png" style="height: 60%; width: 70%;">
+      <!-- LINEA hORIZONTAL -->
+      <br>
+      <hr><br>
+      <img src="..\static\ImagenesProcesadas\MatrizCorrelacion2.png" style="height: 60%; width: 70%;">
+    </div>
+
+    <!-- LINEA hORIZONTAL -->
+    <br>
+    <hr><br>
+
+    <h1 class="Jugadores" style="background-color: #69fd08;">Reducción de dimensionalidad PCA</h1>
+    <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+      El análisis de componentes principales (Principal Component Analysis PCA) es un método de reducción
+      de dimensionalidad que permite simplificar la complejidad de espacios con múltiples dimensiones a la
+      vez que conserva su información. El método de PCA permite por lo tanto "condensar" la información
+      aportada por múltiples variables en solo unas pocas componentes. Aun así, no hay que olvidar que
+      sigue siendo necesario disponer del valor de las variables originales para calcular las componentes.
+      Dos de las principales aplicaciones del PCA son la visualización y el preprocesado de predictores
+      previo ajuste de modelos supervisados [1].
+    </h5>
+    <br>
+    <h5 class="Texto3" style="margin-left: 10%; width: 80%; text-align: justify;">
+      Teniendo claro el funcionamiento del PCA para la reducción de dimensionalidad se implementa donde
+      se tiene como paranetros que se conserve como minimo el 95% de la informacion del dataset
+    </h5>
+    <br>
+    <form id="PCAREDUCCION">
+      <div class="Jugador">
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="floatingInput1" placeholder="PORCENTAJE_ELIMINAR"
+            name="PORCENTAJE_ELIMINAR">
+          <label for="floatingInput">Porcentaje de información</label>
+        </div>
+      </div>
+      <p>
+      <div class="Jugador">
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="floatingInput1" placeholder="COLUMNAS_ELIMINAR"
+            name="COLUMNAS_ELIMINAR">
+          <label for="floatingInput">Columnas a eliminar</label>
+        </div>
+      </div>
+      <p>
+        <button type="submit" class="btn btn-success" id="REDUCIONPCA" style="width: 250px; margin-left: 40%;"
+          onclick="">
+          EJECUTAR
+        </button>
+      </p>
+    </form>
+    <br>
+
+    <!-- ALERTA -->
+    <div id="liveAlertPlaceholder" style="width: 70%; text-align: center;margin-left: 15%;">      
+    </div>
+
+    <div class="Tabla1">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"># Columnas</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Porcentaje</th>
+            <th scope="col">Numero de componentes</th>
+            <th scope="col">Perdida de información</th>
+            <!-- <th scope="col">Esp_Disponible</th>        -->
+          </tr>
+        </thead>
+        <tbody id="TablaInfoReduccion">
+        </tbody>
+      </table>
+      <br>
+    </div>
+  </div>
+
+
+  <!-- Pie de Página -->
+  <footer class="footer">
+    <br>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Acerca de Nosotros</h5>
+          <p>Este es un proyecto para la obtencion del titulo de ingeniero en telecomunicaciones
+            en la universidad distrital Francisco Jose de Caldas.</p>
+        </div>
+        <div class="col-md-4">
+
+        </div>
+        <div class="col-md-4">
+          <h5>Contacto</h5>
+          <p>
+            Universidad: Universidad Distrital Francisco Jose de caldas<br>
+            Teléfono: +123 456 7890<br>
+            Email1: info@example.com
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 text-center">
+          <p>&copy; 2024 Sistema de deteccion de ataques de IoT.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Links Estilos y Boostrap -->
+  <script src="../static/java.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
