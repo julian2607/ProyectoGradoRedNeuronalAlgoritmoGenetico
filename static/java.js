@@ -56,21 +56,26 @@ document.getElementById('RealizarPreProcesamiento').addEventListener('submit', f
     var loadingScreen = document.getElementById('loadingScreen');
     loadingScreen.classList.remove('hidden');
     var formData = new FormData(this);
+    //MODAL RESULTADO
+    var modal = document.getElementById('myModal');
+    var modalMessage = document.getElementById('modalMessage');
+    var closeModal = document.querySelector('.modal .close');
 
     fetch('http://127.0.0.1:5000/PreProcesamiento', {
         method: 'POST',
         body: formData
-    })
-    .then(response => response.json())
+    })    
     .then(data => {
         loadingScreen.classList.add('hidden');
-        modalMessage.textContent = "PCA Realizado correctamente";         
+        modal.classList.remove('hidden')  
+        modalMessage.textContent = "PreProcesamiento Realizado correctamente";   
+        modal.style.display = 'flex';        
         console.log(data); 
     })
     .catch(error => {
         loadingScreen.classList.add('hidden');
         console.error('Error:', error);        
-    });
+    });    
 });
 
 //REDUCCION DE DIMENSIONALIDAD
@@ -85,7 +90,7 @@ document.getElementById('PCAREDUCCION').addEventListener('submit', function(even
     //MODAL RESULTADO
     var modal = document.getElementById('myModal');
     var modalMessage = document.getElementById('modalMessage');
-    var closeModal = document.querySelector('.modal .close');
+    // var closeModal = document.querySelector('.modal .close');
 
     fetch('http://127.0.0.1:5000/ReduccionDimensionalidadPCA', {
         method: 'POST',

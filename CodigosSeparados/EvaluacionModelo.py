@@ -8,20 +8,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
 
 # Cargar el modelo desde el archivo .h5
-model = load_model('Proyecto de Grado\/modelo.h5')
+model = load_model('CodigoGit\DatosProcesados\modelo.h5')
 
 # Cargar los datos desde los archivos .npy
-x_train = np.load('Proyecto de Grado/DatosProcesados/x_train.npy')
-x_test = np.load('Proyecto de Grado/DatosProcesados/x_test.npy')
-y_train = np.load('Proyecto de Grado/DatosProcesados/y_train.npy')
-y_test = np.load('Proyecto de Grado/DatosProcesados/y_test.npy')
+x_train = np.load('CodigoGit/DatosProcesados/x_train.npy')
+x_test = np.load('CodigoGit/DatosProcesados/x_test.npy')
+y_train = np.load('CodigoGit/DatosProcesados/y_train.npy')
+y_test = np.load('CodigoGit/DatosProcesados/y_test.npy')
 
 # cargar encoder 
-encoder = joblib.load('Proyecto de Grado/DatosProcesados/encoder.joblib')
-scaler = joblib.load('Proyecto de Grado/DatosProcesados/scaler.joblib')
+encoder = joblib.load('CodigoGit/DatosProcesados/encoder.joblib')
+scaler = joblib.load('CodigoGit/DatosProcesados/scaler.joblib')
 
 # Asumiendo que tienes nuevas entradas y etiquetas
-data = pd.read_excel('Proyecto de Grado\DataSedPCA_FINAL2 _PRUEBA.xlsx')
+data = pd.read_excel('Dataset\DataSedPCA_FINAL2 _PRUEBA.xlsx')
 new_inputs = data.iloc[:, :-1]  # Todas las columnas excepto la última
 new_outputs = data.iloc[:, -1]  # Última columna (variable objetivo)
 # Normaliza las nuevas entradas usando el scaler cargado

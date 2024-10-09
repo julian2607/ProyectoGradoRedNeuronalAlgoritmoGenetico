@@ -20,7 +20,7 @@ from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam,Nadam,RMSprop
 from tensorflow.keras.regularizers import l2
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score,roc_auc_score, f1_score,ConfusionMatrixDisplay,confusion_matrix
 
 # ------------------------------------------------------------
 # Bibliotecas pagina web
@@ -31,9 +31,17 @@ from tkinter import *
 from tkinter import Tk
 from tkinter import ttk
 from flask import Flask, request, render_template,jsonify
+import logging
+import warnings
 # PDF
 import pandas as pd
 from fpdf import FPDF
+
+# --------------------------------------------------------------
+# librerias algortimo
+from deap import base, creator, tools, algorithms
+import joblib
+
 
 # Importar librería del conector de mysql
 import mysql.connector as mysql
@@ -44,8 +52,18 @@ from email.mime.text import MIMEText
 # Iniciar Flask
 Pagina = Flask(__name__)
 
+# Desactivar logging de accesos
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
+
 # Variables Globales
 global Dataset
+
+# Ignorar las advertencias de tensorflow
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+# Suprimir todas las advertencias
+# warnings.filterwarnings("ignore")
 
 
 # --------------------CARGAR DATOS PARA PRUEBAS ----------------------------------#
@@ -57,17 +75,17 @@ def Cargardatos():
     Outputs = data.iloc[:, -1]   # Última columna (variable objetivo)
     x_train, x_test, y_train, y_test = train_test_split(inputs, Outputs, test_size=0.3, random_state=42)
     # Cargar el encoder y las clases
-    all_classes = np.load('Proyecto de Grado\classes.npy', allow_pickle=True)
-    encoder_categories = np.load('Proyecto de Grado\encoder_categories.npy', allow_pickle=True).tolist()
+    all_classes = np.load('scaler.joblib', allow_pickle=True)
+    encoder_categories = np.load('encoder_categories.npy', allow_pickle=True).tolist()
     encoder = OneHotEncoder(categories=encoder_categories, sparse=False)
     # Transformar las etiquetas de salida
     y_train = encoder.fit_transform(y_train.values.reshape(-1, 1))
     y_test = encoder.transform(y_test.values.reshape(-1, 1))
     # Guardar los datos en archivos .npy
-    np.save('Proyecto de Grado/DatosProcesados/x_train.npy', x_train)
-    np.save('Proyecto de Grado/DatosProcesados/x_test.npy', x_test)
-    np.save('Proyecto de Grado/DatosProcesados/y_train.npy', y_train)
-    np.save('Proyecto de Grado/DatosProcesados/y_test.npy', y_test)
+    np.save('CodigoGit/DatosProcesados/x_train.npy', x_train)
+    np.save('CodigoGit/DatosProcesados/x_test.npy', x_test)
+    np.save('CodigoGit/DatosProcesados/y_train.npy', y_train)
+    np.save('CodigoGit/DatosProcesados/y_test.npy', y_test)
      
     # Dimenciones Datos pruebas
     print(x_test.shape)
@@ -83,7 +101,7 @@ def DistribucionDatos():
         plt.title(f'Distribución de los datos Columan: {column}')
         plt.xlabel(column)
         plt.ylabel('Frecuencia')
-    plt.savefig('Proyecto de Grado\static\ImagenesProcesadas\CaracteristicasImport2.png')
+    plt.savefig('CodigoGit\static\ImagenesProcesadas\CaracteristicasImport2.png')
 
     # Contar la cantidad de cada tipo de ataque
     ataques_counts = df1['label'].value_counts()
@@ -95,15 +113,15 @@ def DistribucionDatos():
         'Cantidad': ataques_counts.values,
         'Porcentaje': ataques_percentage.values
     })
-    # Guardar el DataFrame en un archivo Excel
-    result_df.to_excel('Proyecto de Grado/DatosProcesados/Cantidad_y_Porcentaje_Ataques.xlsx', index=False)
+    # Guardar el DataFrame en un archivo Excel    
+    result_df.to_excel('CodigoGit/DatosProcesados/Cantidad_y_Porcentaje_Ataques.xlsx', index=False)
 
     # Graficar un gráfico circular para el porcentaje de cada tipo de ataque
     plt.figure(figsize=(10, 8))
     plt.pie(ataques_percentage, labels=ataques_percentage.index, autopct='%1.1f%%', startangle=140)
     plt.title('Porcentaje de cada tipo de ataque')
     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.savefig('Proyecto de Grado\static\ImagenesProcesadas\Porcentaje_Ataques.png', bbox_inches='tight')
+    plt.savefig('CodigoGit\static\ImagenesProcesadas\Porcentaje_Ataques.png', bbox_inches='tight')
 
 # -------------------------INFORMACION MUTUA ---------------------------------------------#
 def InfromacionMutua():
@@ -124,10 +142,7 @@ def InfromacionMutua():
     plt.ylabel('Información Mutua')
     plt.xticks(rotation=90, ha='right')
     plt.tight_layout()  # Ajustar el diseño para que no se corten las etiquetas
-    plt.savefig('Proyecto de Grado\static\ImagenesProcesadas\ImportaciaCaractDatos.png', bbox_inches='tight')
-    # plt.show()
-    # Guardar los resultados en un archivo CSV
-    # mi_df.to_csv('mutual_information_results.csv')
+    plt.savefig('CodigoGit\static\ImagenesProcesadas\ImportaciaCaractDatos.png', bbox_inches='tight')
     print("Información mutua calculada y guardada en 'mutual_information_results.csv'.")
 
 # -------------MATRIZ CORRELACION DATOS CON COLUMNA OBJETIVO-----------------------------#
@@ -149,7 +164,7 @@ def MatrizCorrelacion_1():
     plt.figure(figsize=(16,25))
     sns.heatmap(correlation_with_categorical, annot=False, cmap='coolwarm')
     plt.title('Matriz de Correlación')    
-    plt.savefig('Proyecto de Grado\static\ImagenesProcesadas\MatrizCorrelacion.png', bbox_inches='tight')
+    plt.savefig('CodigoGit\static\ImagenesProcesadas\MatrizCorrelacion.png', bbox_inches='tight')
 
 #-------------------- MATRIZ DE CORRELACION 2--------------------------------------------#
 def MatrizCorrelacion_2():
@@ -168,7 +183,7 @@ def MatrizCorrelacion_2():
     # Rotar las etiquetas del eje x para que no se corten y queden verticales
     plt.xticks(rotation=90, ha='center')
     # Mostrar el gráfico
-    plt.savefig('Proyecto de Grado\static\ImagenesProcesadas\MatrizCorrelacion2.png', bbox_inches='tight')
+    plt.savefig('CodigoGit\static\ImagenesProcesadas\MatrizCorrelacion2.png', bbox_inches='tight')
 
 # -------------------------------PCA -------------------------------------------------------#
 @Pagina.route('/ReduccionDimensionalidadPCA' , methods = ['GET', 'POST'])
@@ -180,7 +195,7 @@ def FuncionPCA():
         data = Dataset  
     except NameError:        
         # CARGAR INFORMACION DEL DATASET
-        Url = "Proyecto de Grado\DataSetPruebas.xlsx"        
+        Url = "DataSet\DataSetPruebas.xlsx"        
         print(f"Direccion: {Url}")
         Dataset = pd.read_excel(Url)
 
@@ -248,16 +263,16 @@ def FuncionPCA():
         print("Creando Documento")
         reduced_data = pd.DataFrame(X_reduced, columns=Columnas)
         reduced_data['Tipo de Ataque'] = y.values
-        reduced_data.to_excel('Proyecto de Grado/DatosProcesados/DataSedPCA_PROCESADO.xlsx', index=False)
+        reduced_data.to_excel('CodigoGit/DatosProcesados/DataSedPCA_PROCESADO.xlsx', index=False)
         print("Documento Creado")
 
         # División del dataset con las características reducidas
         X_train_pca, X_test_pca, y_train, y_test = train_test_split(X_reduced, y, test_size=0.2, random_state=42)
         # Guardado del dataset procesado
-        np.save('Proyecto de Grado/DatosProcesados/X_train_pca.npy', X_train_pca)
-        np.save('Proyecto de Grado/DatosProcesados/X_test_pca.npy', X_test_pca)
-        np.save('Proyecto de Grado/DatosProcesados/y_train.npy', y_train)
-        np.save('Proyecto de Grado/DatosProcesados/y_test.npy', y_test)
+        np.save('CodigoGit/DatosProcesados/X_train_pca.npy', X_train_pca)
+        np.save('CodigoGit/DatosProcesados/X_test_pca.npy', X_test_pca)
+        np.save('CodigoGit/DatosProcesados/y_train.npy', y_train)
+        np.save('CodigoGit/DatosProcesados/y_test.npy', y_test)
 
          # Comando guaradr ganador tabla
         BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
@@ -328,7 +343,7 @@ def modeloRed(Epocas,bach,Earling,validation):
 
     #Guardar informacion del entrenamiento en 
     print("Guardando Historial Entrenamiento")
-    metrics_df.to_csv('Proyecto de Grado/historial_entrenamiento.csv', index=False)
+    metrics_df.to_csv('CodigoGit/DatosProcesados/historial_entrenamiento.csv', index=False)
 
     # Evaluar el modelo en el conjunto de prueba
     loss, accuracy, loss2 = model.evaluate(x_test, y_test)
@@ -351,12 +366,12 @@ def modeloRed(Epocas,bach,Earling,validation):
 
     # Guardar el modelo y el escalador
     print("Creando documento Modelo")
-    model.save('Proyecto de Grado/modelo.h5')
+    model.save('CodigoGit/DatosProcesados/modelo.h5')
     print("Documento Modelo Red Creado")
 
     #------------------------ Mostrar Resulatdios y graficas del entrennamiento.-----------------------#
     # Cargar el archivo CSV
-    df = pd.read_csv("Proyecto de Grado/historial_entrenamiento.csv")
+    df = pd.read_csv("CodigoGit/DatosProcesados/historial_entrenamiento.csv")
     # Gráfico de precisión
     plt.subplot(2, 1, 1)
     plt.plot(df['Epoch'], df['Accuracy'], label='Precisión (Training)')
@@ -374,7 +389,7 @@ def modeloRed(Epocas,bach,Earling,validation):
     plt.legend()
 
     plt.tight_layout()    
-    plt.savefig('Proyecto de Grado/static/EstadisticasEntrenamiento.png', bbox_inches='tight')
+    plt.savefig('CodigoGit/static/EstadisticasEntrenamiento.png', bbox_inches='tight')
     
     # GUARDAR INFORMACION EN BASE DE DATOS
     BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
@@ -386,8 +401,148 @@ def modeloRed(Epocas,bach,Earling,validation):
   
 
 # ------------------- ENTRENAR MODELO CON ALGORITMO-----------------------------------------#
-def modeloAlgoritmo():
-    global Dataset, inputs, Outputs, x_train, x_test, y_train, y_test
+# crear modelo de red neuronal
+def create_model():
+    model = Sequential()
+    model.add(Dense(128, activation='relu', input_dim=x_train.shape[1], kernel_regularizer=l2(0.001)))
+    model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.001)))
+    model.add(Dense(y_train.shape[1], activation='sigmoid'))
+    return model
+
+# Obtener todos los pesos de la red y aplanarlos en un vector
+def get_weights(model):
+    weights = []
+    for layer in model.layers:
+        layer_weights = layer.get_weights()
+        weights.extend(layer_weights[0].flatten())
+        weights.extend(layer_weights[1].flatten())
+    return np.array(weights)
+
+# Establecer los pesos de la red desde un vector
+def set_weights(model, weights):
+    new_weights = []
+    index = 0
+    for layer in model.layers:
+        layer_weights = layer.get_weights()
+        weight_shape = layer_weights[0].shape
+        bias_shape = layer_weights[1].shape
+        weight_size = np.prod(weight_shape)
+        bias_size = np.prod(bias_shape)
+        new_weights.append(weights[index:index + weight_size].reshape(weight_shape))
+        index += weight_size
+        new_weights.append(weights[index:index + bias_size].reshape(bias_shape))
+        index += bias_size
+        layer.set_weights(new_weights[-2:])
+
+# funcion fitnnes (objetivo)
+def evaluate_nn(weights):
+    global EpocasRed,batch_size,validation_split
+    set_weights(model, weights)
+    optimizer = Adam(learning_rate=0.001)
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+    early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+    history = model.fit(x_train, y_train, epochs=EpocasRed, batch_size=batch_size, validation_split=validation_split, callbacks=[early_stopping], verbose=0)
+    _, accuracy = model.evaluate(x_test, y_test, verbose=0)
+    y_pred = model.predict(x_test,verbose=0)
+    y_test_labels = np.argmax(y_test, axis=1)
+    y_pred_labels = np.argmax(y_pred, axis=1)
+    precision = precision_score(y_test_labels, y_pred_labels, average='weighted')
+    recall = recall_score(y_test_labels, y_pred_labels, average='weighted')
+    print("acurracy: %s  precision: %s recall: %s"%(accuracy,precision,recall) )
+    return (accuracy,precision,recall,)
+
+# Función similar para el Hall of Fame
+def similar(ind1, ind2):
+    return np.allclose(ind1, ind2, atol=1e-6)
+
+# funcion algortimo con red neronal
+def modeloAlgoritmo(poblacion,generaciones,pcruce,pmutacion,mu1,sigma,Pesos):
+    global Dataset, inputs, Outputs, x_train, x_test, y_train, y_test,model,EpocasRed
+
+    model = create_model()
+
+    creator.create("FitnessMax", base.Fitness, weights=(1.0,3.5,-1.0))
+    creator.create("Individual", np.ndarray, fitness=creator.FitnessMax)
+
+    toolbox = base.Toolbox()
+    toolbox.register("attr_float", np.random.uniform, -1, 1, len(get_weights(model)))
+    toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.attr_float)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+    toolbox.register("evaluate", evaluate_nn)
+    toolbox.register("mate", tools.cxTwoPoint)
+    toolbox.register("mutate", tools.mutGaussian, mu=mu1, sigma=sigma, indpb=0.2)
+    toolbox.register("select", tools.selTournament, tournsize=3)
+
+    #PARAMETROS DEL ALGORTIMO 
+    population = toolbox.population(n=poblacion)
+    ngen = generaciones
+    cxpb = pcruce
+    mutpb = pmutacion
+
+    #ESTADISITCAS DE POBLACION ENTRENAMIENTO
+    hof = tools.HallOfFame(1, similar=similar)
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
+
+    #ESTABLECER ALGORITMO 
+    population, logbook = algorithms.eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=stats, halloffame=hof, verbose=True)
+
+    #MEJOR INDIVIDUO
+    print("---------------------------------------------------------------------------")
+    best_individual = hof[0]
+    best_weights = np.array(best_individual)
+    set_weights(model, best_weights)
+    # Imprime el mejor individuo absoluto guardado en hof
+    print("El mejor individuo es: %s with fitness: %s" % (best_individual, best_individual.fitness.values))
+
+    # MEJOR AL FINAL DEL PROCESO
+    print("---------------------------------------------------------------------------")
+    best_individual2 = tools.selBest(population, 1)[0]
+    accuracy,presicicon,recall = best_individual2.fitness.values
+    print("accuracy: %s" % (accuracy))
+    print("El mejor individio de la población es: %s\nwith fitness: %s" % (best_individual2, best_individual2.fitness.values))
+
+    # Aplicar los pesos del mejor individuo al modelo
+    print("---------------------------------------------------------------------------")
+    print("Colocando pesos")
+    set_weights(model, np.array(best_individual2))
+    evaluate_nn(np.array(best_individual2))
+
+    print("---------------------------------------------------------------------------")
+    print("Evaluando Modelo")
+    # Evaluar el modelo en el conjunto de prueba forma 1
+    y_pred = model.predict(x_test)
+    y_test_labels = np.argmax(y_test, axis=1)
+    y_pred_labels = np.argmax(y_pred, axis=1)
+    precision = precision_score(y_test_labels, y_pred_labels, average='weighted')
+    recall = recall_score(y_test_labels, y_pred_labels, average='weighted')
+    f1 = f1_score(y_test_labels, y_pred_labels, average='weighted')
+    print(f'Exactitud: {accuracy}')
+    print(f'Precisión: {precision}')
+    print(f'Sensibilidad: {recall}')
+    print(f'f1: {f1}')
+
+    cm = confusion_matrix(y_test_labels, y_pred_labels)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot()
+    plt.title('Matriz de Confusión')
+    plt.savefig('CodigoGit/static/ImagenesProcesadas/MatrizConfusión.jpg', bbox_inches='tight')
+
+    #GUARDAR EL MODELO
+    model.save('CodigoGit/DatosProcesados/mejor_modelo_pesos.h5')
+    print("Mejor modelo guardado.")
+
+    #GUARDAR RESULTADOS BASE DE DATOS
+    BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
+    Cursor = BD.cursor()
+    Comando="insert into ALGORITMO(Poblacion,Generaciones,Epocas,Pcruce,PrMutacion,Pesos,Exactitud,Presicion,Sensibilidad,F1) values(%s, %s,%s,%s, %s,%s,%s,%s,%s,%s);"        
+    Valores=(str(poblacion),str(generaciones),str(EpocasRed),str(pcruce),str(pmutacion),str(Pesos),str(accuracy),str(round(precision, 18)),str(round(recall,18)),str(round(recall,18)))
+    Cursor.execute(Comando,Valores)  
+    BD.commit()  
 
 
 # ------------------------CARGAR INFORMACION DEL MODELO------------------------------------#
@@ -400,12 +555,9 @@ def cargarinfo():
     Valores_pagina = request.form 
     Url=Valores_pagina['UrlDatasetPre']
     
-    #RUTA DATOSPREPROCESADPS
-    # "Proyecto de Grado\DataSedPCA _PUEBAS.xlsx"   
-
     # CARGAR INFORMACION DEL DATASET
     if Url == "": 
-        Url = "Proyecto de Grado\DataSetPruebas.xlsx"        
+        Url = "Dataset\DataSetPruebas.xlsx"        
     print(f"Direccion: {Url}")
     
     try:
@@ -433,7 +585,7 @@ def cargarinfo():
 # ----------- Este metodo llama las fuciones PARA ENTRENAR EL MODELO CON EL ALGORTIMO----------#
 @Pagina.route('/EntrenarModelo' , methods = ['GET', 'POST'])
 def EntrenarModelo_Resultado():
-
+    global EpocasRed,batch_size,validation_split
     print("Entrenando modelo")
     Valores_pagina = request.form 
 
@@ -453,27 +605,28 @@ def EntrenarModelo_Resultado():
 
     mu= Valores_pagina['Gama'] 
     sigma= Valores_pagina['Sigma']
-    # indpb=Valores_pagina['Poblacion']
+    Pesos=Valores_pagina['Importancias']
     
     # VALIDAR PARAMETROS ANTES DE ENTRENAR RED
-    if EpocasRed == "":EpocasRed = 3
+    if EpocasRed == "":EpocasRed = 1
     if batch_size == "":batch_size = 32
     if validation_split == "":validation_split = 0.2
     if early_stopping == "":early_stopping =1
 
     # VALIDAR PARAMETROS DEL ALGORTIMO
-    if Poblacion == "":Poblacion = 10
-    if Generaciones == "":Generaciones = 5
+    if Poblacion == "":Poblacion = 1
+    if Generaciones == "":Generaciones = 1
     if ProbCruce == "":ProbCruce = 0.55
     if ProbMutacion == "":ProbMutacion =0.22
-    if mu == "":mu =0.22
-    if sigma == "":sigma =0.22
+    if mu == "":mu =0.1
+    if sigma == "":sigma =0.2
+    if Pesos == "": Pesos = [1.0,3.5,-0.5]
 
     #IMPRITMIR PARA METROS DE ENTRADA
     print("Datos Red Neuronal")
-    print(f"{EpocasRed} + {batch_size} + {validation_split} + {early_stopping}")
+    print(f"{EpocasRed} + ; + {batch_size} + ; + {validation_split} + ; + {early_stopping}")
     print("DatosAlgortimo")
-    print(f"{Poblacion} + {Generaciones} + {ProbCruce} + {ProbMutacion}")
+    print(f"{Poblacion} + ; + {Generaciones}+ ; + {ProbCruce}+ ; + {ProbMutacion}+ ; +{Pesos}")
 
     # EJECUTAR MODELO O MODELO CON ALGORTIMO
     if Indicador == "1":
@@ -481,7 +634,7 @@ def EntrenarModelo_Resultado():
         modeloRed(int(EpocasRed),int(batch_size),int(early_stopping),int(validation_split))
     elif Indicador == "2":
         print("Algortimo")
-        # modeloAlgoritmo()
+        modeloAlgoritmo(Poblacion,Generaciones,ProbCruce,ProbMutacion,mu,sigma,Pesos)
     else:
         print("Opcion no valida por favor validar")
     return render_template('Entrenamiento.html')
@@ -489,7 +642,7 @@ def EntrenarModelo_Resultado():
 #Cargar el modelo
 def Cargarmodelo():   
     global  loaded_model
-    loaded_model = load_model('Proyecto de Grado/modelo.h5')
+    loaded_model = load_model('CodigoGit/DatosProcesados/modelo.h5')
     DatosModelo = loaded_model.summary()
     # Verificar la arquitectura actual del modelo
     print(DatosModelo)
@@ -500,16 +653,87 @@ def Cargarmodelo():
 
 
 # Evaluar el modelo
-@Pagina.route('/EvaluarModelo')
-def Evaluarmodelo(loaded_model,x_test,y_test):  
-    # CARAGR MODELO
-    print("Cragando Modelo")
-    Cargarmodelo()
-    print("Modelo Cargado")
+@Pagina.route('/EvaluarModelo',methods = ['GET', 'POST'])
+def Evaluarmodelo():
+    print("Entra")  
+    global loaded_model,x_test,y_test, Dataset
+    Valores_pagina = request.form     
+    Url=Valores_pagina['DataEntrenar']
+
+    if Url == "": 
+        Url = "Dataset\DataSedPCA_FINAL2 _PRUEBA.xlsx"        
+    print(f"Direccion: {Url}")
+
+    # Cargar el modelo desde el archivo .h5
+    model = load_model('CodigoGit/DatosProcesados/modelo.h5')
+
+    # Cargar los datos desde los archivos .npy
+    x_train = np.load('CodigoGit/DatosProcesados/x_train.npy')
+    x_test = np.load('CodigoGit/DatosProcesados/x_test.npy')
+    y_train = np.load('CodigoGit/DatosProcesados/y_train.npy')
+    y_test = np.load('CodigoGit/DatosProcesados/y_test.npy')
+
+    # cargar encoder 
+    encoder = joblib.load('CodigoGit/DatosProcesados/encoder.joblib')
+    scaler = joblib.load('CodigoGit/DatosProcesados/scaler.joblib')
+
+    # Asumiendo que tienes nuevas entradas y etiquetas
+    data = pd.read_excel(Url)
+    new_inputs = data.iloc[:, :-1]  # Todas las columnas excepto la última
+    new_outputs = data.iloc[:, -1]  # Última columna (variable objetivo)
+    # Normaliza las nuevas entradas usando el scaler cargado
+    new_inputs = scaler.transform(new_inputs)
+    # Codifica las etiquetas de salida usando el encoder cargado
+    new_outputs = encoder.transform(new_outputs.values.reshape(-1, 1))
+
+    # Evaluar el modelo en los datos de prueba procesados adecuadamente
+    evaluation = model.evaluate(new_inputs, new_outputs)
+    loss = evaluation[0]
+    accuracy = evaluation[1]
+    print(f'Pérdida: {loss}, Exactitud: {accuracy}')
+
+    # Obtener predicciones y convertir a formato binario si es necesario
+    y_pred_prob = model.predict(x_test)
+    y_test_binary = np.argmax(y_test, axis=1) if y_test.ndim > 1 else y_test
+    y_pred_binary = np.argmax(y_pred_prob, axis=1)
+
+    # Verificar los tamaños de y_test_binary y y_pred_binary
+    print(f'Tamaño de y_test_binary: {y_test_binary.shape}')
+    print(f'Tamaño de y_pred_binary: {y_pred_binary.shape}')
+
+    # Asegurarse de que los tamaños coincidan
+    if y_test_binary.shape != y_pred_binary.shape:
+        raise ValueError("El tamaño de y_test_binary y y_pred_binary no coincide.")
+
+    # Calcular métricas adicionales
+    precision = precision_score(y_test_binary, y_pred_binary, average='macro')
+    recall = recall_score(y_test_binary, y_pred_binary, average='macro')
+    f1 = f1_score(y_test_binary, y_pred_binary, average='macro')
+    auc = roc_auc_score(y_test, y_pred_prob, multi_class='ovr') if y_test.ndim > 1 else roc_auc_score(y_test, y_pred_prob)
+
+    print(f'Precision: {precision}, Sencibilidad: {recall}, F1-Score: {f1}, AUC: {auc}')
+
+    # Graficar la matriz de confusión
+    cm = confusion_matrix(y_test_binary, y_pred_binary)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot()
+    plt.title('Matriz de Confusión')
+    plt.show()
+
+     #GUARDAR RESULTADOS BASE DE DATOS
+    BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
+    Cursor = BD.cursor()
+    Comando="insert into EJECUTARMODELO(Exactitud,Presicion,Sensibilidad,F1) values(%s,%s,%s,%s);"        
+    Valores=(str(accuracy),str(round(precision, 18)),str(round(recall,18)),str(round(recall,18)))
+    Cursor.execute(Comando,Valores)  
+    BD.commit()  
 
     # EVALUAR MODELO    
-    loss, accuracy = loaded_model.evaluate(x_test, y_test)
-    print(f'Loss: {loss}, Accuracy: {accuracy}')
+    # print("Evaluando modelo")
+    # loss, accuracy = loaded_model.evaluate(x_test, y_test)
+    # print(f'Loss: {loss}, Accuracy: {accuracy}')
+    # print("Modelo Evaluado")
+    return render_template('EjecutarModelo.html')
 
 
 #Dirección principal
@@ -551,7 +775,6 @@ def PDF():
     # BD.commit()
     # """Cerrar la BD"""
     # BD.close()    
-    
     # print(df)
     # pdf = FPDF()            
     # pdf.add_page(orientation='L')   
@@ -560,13 +783,11 @@ def PDF():
     # for col in df.columns:
     #     pdf.cell(23, 10, col, border=1)
     # pdf.ln()
-
     # Datos de la tabla
     # for i in range(df.shape[0]):
     #     for j in range(df.shape[1]):                                      
     #         pdf.cell(23, 15, str(df.iloc[i, j]) [0:9], border=1)
     #     pdf.ln()
-
     # #Guardar pdf
     # pdf.output('ProyectoCorte2Monitoreo/data.pdf', 'F')     
     return render_template('PaginaMonitoreo.html')
@@ -594,7 +815,7 @@ def ActualizarInformacion():
 
 @Pagina.route('/ActualizarInformacionEntrenamiento')
 def ActualizarInformacionEntrenamiento():
-    # CONSULTAR INFROMACION DE LOS PCA 
+    # CONSULTAR INFROMACION DE la RED NEURONAL
     BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
     Cursor = BD.cursor()       
     Cursor.execute("SELECT * FROM RedNeuronal")    
@@ -608,12 +829,50 @@ def ActualizarInformacionEntrenamiento():
                 value = value[:4]
             html_table += "<td>{}</td>".format(value)
         html_table += "</tr>"
-
     #CERRAR CONEXION 
     BD.commit()               
     BD.close()
-    return jsonify({'TablaRed': html_table})
 
+    # CONSULTAR INFORMACION DEL ALGORTIMO
+    BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
+    Cursor = BD.cursor()       
+    Cursor.execute("SELECT * FROM Algoritmo")    
+    html_table2=""
+    for row in Cursor:
+        html_table2 += "<tr>"
+        cont=0
+        for value in row:
+            cont +=1
+            if cont>2 and cont!=8:
+                value = value[:4]
+            html_table2 += "<td>{}</td>".format(value)
+        html_table2 += "</tr>"
+    #CERRAR CONEXION 
+    BD.commit()               
+    BD.close()
+    return jsonify({'TablaRed': html_table, 'TablaAlgoritmo':html_table2})
+
+
+@Pagina.route('/ActualizarInformacionResultados')
+def ActualizarInformacionEjecutar():
+    # CONSULTAR INFORMACION DEL ALGORTIMO
+    BD = mysql.connect(host=ORIGEN, user=USUARIO, passwd=CONTRASENA, db=BASEDATOS)
+    Cursor = BD.cursor()       
+    Cursor.execute("SELECT * FROM EJECUTARMODELO")    
+    html_table2=""
+    for row in Cursor:
+        html_table2 += "<tr>"
+        cont=0
+        for value in row:
+            cont +=1
+            if cont>2:
+                value = value[:4]
+            html_table2 += "<td>{}</td>".format(value)
+        html_table2 += "</tr>"
+    #CERRAR CONEXION 
+    BD.commit()               
+    BD.close()
+    return jsonify({'TablaEjecutar':html_table2})
 
 '''Función principal'''
 if __name__ == "__main__":    

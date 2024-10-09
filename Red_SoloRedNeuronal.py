@@ -51,7 +51,7 @@ def load_dataset():
     # print("Documento Creado")
 
 # ----------------------EJECUTAR RED NEURONAL CON DATOS PROCESADOS -----------------------------#
-    data = pd.read_excel('Proyecto de Grado\DataSedPCA_FINAL2 _PRUEBA.xlsx')
+    data = pd.read_excel('Dataset\DataSedPCA_FINAL2 _PRUEBA.xlsx')
     inputs = data.iloc[:, :-1]  # Todas las columnas excepto la última
     Outputs = data.iloc[:, -1]   # Última columna (variable objetivo)
 
@@ -68,14 +68,14 @@ def load_dataset():
     # encoder = OneHotEncoder(handle_unknown='ignore', sparse=False) 
 
     # Guardar los datos en archivos .npy
-    np.save('Proyecto de Grado/DatosProcesados/x_train.npy', x_train)
-    np.save('Proyecto de Grado/DatosProcesados/x_test.npy', x_test)
-    np.save('Proyecto de Grado/DatosProcesados/y_train.npy', y_train)
-    np.save('Proyecto de Grado/DatosProcesados/y_test.npy', y_test)
+    np.save('CodigoGit/DatosProcesados/x_train.npy', x_train)
+    np.save('CodigoGit/DatosProcesados/x_test.npy', x_test)
+    np.save('CodigoGit/DatosProcesados/y_train.npy', y_train)
+    np.save('CodigoGit/DatosProcesados/y_test.npy', y_test)
 
     # Guardar el OneHotEncoder ajustado
-    joblib.dump(encoder, 'Proyecto de Grado/DatosProcesados/encoder.joblib')
-    joblib.dump(scaler, 'Proyecto de Grado/DatosProcesados/scaler.joblib')
+    joblib.dump(encoder, 'CodigoGit/DatosProcesados/encoder.joblib')
+    joblib.dump(scaler, 'CodigoGit/DatosProcesados/scaler.joblib')
     return x_train, x_test, y_train, y_test
 
 # ------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     #Guardar informacion del entrenamiento en 
     print("Guardando Historial Entrenamiento")
-    metrics_df.to_csv('Proyecto de Grado/historial_entrenamiento.csv', index=False)
+    metrics_df.to_csv('CodigoGit/DatosProcesados/historial_entrenamiento.csv', index=False)
 
     # Evaluar el modelo en el conjunto de prueba
     loss, accuracy, loss2 = model.evaluate(x_test, y_test)
@@ -146,12 +146,12 @@ if __name__ == "__main__":
 
     # Guardar el modelo y el escalador
     print("Creando documento Modelo")
-    model.save('Proyecto de Grado/modelo.h5')
+    model.save('CodigoGit/DatosProcesados/modelo.h5')
     print("Documento Modelo Red Creado")
 
     #------------------------ Mostrar Resulatdios y graficas del entrennamiento.-----------------------#
     # Cargar el archivo CSV
-    df = pd.read_csv("Proyecto de Grado/historial_entrenamiento.csv")
+    df = pd.read_csv("CodigoGit/DatosProcesados/historial_entrenamiento.csv")
     # Gráfico de precisión
     plt.subplot(2, 1, 1)
     plt.plot(df['Epoch'], df['Accuracy'], label='Precisión (Training)')
@@ -169,6 +169,6 @@ if __name__ == "__main__":
     plt.legend()
 
     plt.tight_layout()    
-    plt.savefig('Proyecto de Grado/static/ImagenesProcesadas/EstadisticasEntrenamiento.png', bbox_inches='tight')
+    plt.savefig('CodigoGit/static/ImagenesProcesadas/EstadisticasEntrenamiento.png', bbox_inches='tight')
     
 

@@ -305,7 +305,7 @@
     <br>
 
     <!-- ALERTA -->
-    <div id="liveAlertPlaceholder" style="width: 70%; text-align: center;margin-left: 15%;">      
+    <div id="liveAlertPlaceholder" style="width: 70%; text-align: center;margin-left: 15%;">
     </div>
 
     <div class="Tabla1">
@@ -317,7 +317,6 @@
             <th scope="col">Porcentaje</th>
             <th scope="col">Numero de componentes</th>
             <th scope="col">Perdida de información</th>
-            <!-- <th scope="col">Esp_Disponible</th>        -->
           </tr>
         </thead>
         <tbody id="TablaInfoReduccion">
@@ -363,6 +362,18 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+  <script>
+    //CERRRAR MODAL ALERTA
+    const modal = document.getElementById('myModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+    console.log(modal, closeModalButton);
+    function closeModal() {
+      console.log('Cerrar modal');  // Para verificar que el evento se dispara
+      modal.classList.add('hidden');
+    }
+    closeModalButton.addEventListener('click', closeModal);
+  </script>
+
 </body>
 
 </html>

@@ -106,6 +106,12 @@ height: 400px;
     text-align: center;
 }
 
+.Tabla2{
+    margin-left: 12%;
+    width: 70%;
+    text-align: center;
+}
+
 /* LINEA */
 hr {
     border: none;

@@ -283,6 +283,11 @@
                 <input type="text" class="form-control" id="Gama" placeholder="Gama" name="Gama">
                 <label for="floatingInput">Gama</label>
               </div>
+              <div class="form-floating mb-3" style="margin-left: 5%;">
+                <input type="text" class="form-control" id="Importancias" placeholder="Importancias"
+                  name="Importancias">
+                <label for="floatingInput">Pesos Algortimo (;)</label>
+              </div>
             </div>
           </div>
 
@@ -311,7 +316,6 @@
     <!-- RESULTADOS ENTRENAMIENTO -->
     <div>
       <!-- linea divisoria<br><hr><br> -->
-
       <!-- Tabla Informacion del entrenamiento -->
       <h1 class="Jugadores" style="background-color: #F33004;">Resultados Entrenamiento Red Neuronal</h1>
       <div class="ContendioRes" style="display: flex;">
@@ -332,8 +336,8 @@
         </div>
       </div>
 
-      <br>
-      <div class="Tabla1">
+      <br />
+      <div class="Tabla2">
         <table class="table table-striped">
           <thead>
             <tr>
@@ -341,7 +345,7 @@
               <th scope="col">Fecha</th>
               <th scope="col">Epocas</th>
               <th scope="col">Batch</th>
-              <th scope="col">Validation</th>
+              <th scope="col">Validacion</th>
               <th scope="col">Training_loss</th>
               <th scope="col">Loss </th>
               <th scope="col">Training_Acurrancy </th>
@@ -354,32 +358,88 @@
           </tbody>
         </table>
       </div>
+      <br />
+      
+      <div class="row">
+        <div style="text-align: center;">
+          <h1 class="Jugadores" style="background-color: #a8ff0f;">Metricas Red neuronal</h1>
+          <div class="row" style="margin-left: 4%;">
+            <div class="card" style="width: 20rem;">
+              <div class="card-body">
+                <h1 class="Jugadores" style="background-color: #0ffff4; font: oblique bold 170% cursive;">Exactitud</h1>
+                <p class="card-text">                  
+                  Un alto valor de exactitud sugiere que el modelo clasifica correctamente una gran proporción
+                  de las instancias del conjunto de datos. Sin embargo, la exactitud como métrica aislada puede
+                  ser engañosa, especialmente en conjuntos de datos desbalanceados.
+                </p>
+              </div>
+            </div>
+
+            <div class="card" style="width: 20rem; margin-left: 2%;">
+              <div class="card-body">
+                <h1 class="Jugadores" style="background-color: #0fb6ff; font: oblique bold 170% cursive;">Presición</h1>
+                <p class="card-text">                  
+                  Un alto valor de precisión indica que el modelo tiene un bajo índice de falsos positivos,
+                  es decir, la mayoría de las instancias clasificadas como positivas son realmente positivas.
+                  Esto es especialmente importante en aplicaciones donde los falsos positivos son costosos o
+                  peligrosos, como en el diagnóstico médico o en sistemas de detección de fraudes.
+                </p>
+              </div>
+            </div>
+
+            <div class="card" style="width: 20rem; margin-top: 0px; margin-left: 2%;">
+              <div class="card-body">
+                <h1 class="Jugadores" style="background-color: #0f5bff; font: oblique bold 170% cursive;">Sensibilidad</h1>
+                <p class="card-text">                  
+                  El recall o sensibilidad es una medida que se centra en los verdaderos positivos y en los
+                  falsos negativos midiendo de todos los casos positivos cuantos corresponde de verdad a ese
+                  tipo de ataque.
+                </p>
+              </div>
+            </div>
+
+            <div class="card" style="width: 50rem; margin-top: 30px;margin-left: 17%;">
+              <div class="card-body">
+                <h1 class="Jugadores" style="background-color: #a40fff; font: oblique bold 170% cursive;">Relacion Precisión - Sensibilidad</h1>
+                <p class="card-text">                  
+                  La sensibilidad va de la mano con la precisión ya que si se tiene un recall alto y una
+                  precisión alta significa que el modelo está agrupando la mayor cantidad de verdaderos
+                  positivos y son de verdad casos positivos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br>
+      </div>
+     
+      <br>
+      <h1 class="Jugadores" style="background-color: #a40fff;">Resultados Algoritmo</h1>
+      <div class="Tabla2" style="width: 76%; margin-left: 10%;">
+        <table class="table table-striped">
+          <thead>
+            <tr>              
+              <th scope="col"># Columnas</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Poblacion</th>
+              <th scope="col">Generaciones</th>
+              <th scope="col">Epocas</th>              
+              <th scope="col">Probabilidad Cruce</th>
+              <th scope="col">Probabilidad Mutación</th>
+              <th scope="col">Pesos</th>
+              <th scope="col">Exactitud</th>
+              <th scope="col">Presicion </th>
+              <th scope="col">Sensibilidad</th>
+              <th scope="col">F1</th>              
+            </tr>
+          </thead>
+          <tbody id="TablaInfoEntrenamientoAlgoritmo">
+          </tbody>
+        </table>
+      </div>
       <br>
     </div>
   </div>
-
-  <!-- <div class="Tabla1">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Esp_Total</th>
-                <th scope="col">Esp_Disponible</th>
-                <th scope="col">%_EspUsado</th>
-                <th scope="col">%_Espacio</th>
-                <th scope="col">Memory_Total</th>
-                <th scope="col">User</th>
-                <th scope="col">User_Inicio </th>
-                <th scope="col">%_Memory</th>
-                <th scope="col">Packets_Sent</th>
-                <th scope="col">Packets_Recv</th>                
-            </tr>
-            </thead>
-            <tbody id="TablaInfo">                                
-            </tbody>
-        </table> -->
-
 
   <!-- Pie de Página -->
   <footer class="footer">
@@ -415,6 +475,20 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+    <!-- CERRAR MODAL ALERTA -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {          
+          const modal = document.getElementById('myModal');
+          const closeModalButton = document.getElementById('closeModalButton');          
+          console.log(modal, closeModalButton);          
+          function closeModal() {
+              console.log('Cerrar modal');
+              modal.classList.add('hidden');
+          }
+          closeModalButton.addEventListener('click', closeModal);
+      });
+  </script>
+
 </body>
 
 </html>

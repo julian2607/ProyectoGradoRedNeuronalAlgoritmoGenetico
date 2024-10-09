@@ -125,6 +125,12 @@
 
   <!-- CONTENIDO PAGINA PRINCIPAL -->
   <div class="Entrenamiento">
+    <!--LOUDER-->
+    <div class="hidden" id="loadingScreen">
+      <div id="loader"></div>
+      <p>Cargando...</p>
+    </div>
+
     <br>
     <h1 class="Jugadores" style="background-color: aqua;">Resultados modelo Guardado</h1>
     <div style="padding: 0 150px; margin-bottom: 30px;">
@@ -134,7 +140,7 @@
     </div>
 
     <div style="width: 90%; margin-left: 5%;">
-      <form action="http://127.0.0.1:5000/Pagina" method="POST" class="row">
+      <form id="EjecutarModeloGuardado">
         <div style="padding: 0 150px; margin-bottom: 10px;">
           <h5 class="Texto1">
             A continuación, se ejecutará el modelo previamente cargado con los datos de
@@ -143,12 +149,12 @@
           </h5>
           <br>
           <div style="width: 70%; margin-left: 15%;">
-            <input type="text" class="form-control" id="DataEntrenar" placeholder="Ubicacion Datos Procesar"
+            <input type="text" class="form-control" id="UrlDatasetPre" placeholder="Ubicacion Datos Procesar"
               name="DataEntrenar">
           </div>
           <br>
         </div>
-        <button type="submit" class="btn btn-success" id="PreProcesamiento"
+        <button type="submit" class="btn btn-success" id="BotonEjecutarModeloGuardado"
           style="width: 250px; margin-left: 40%; background-color: #69fd08;" onclick="">
           Ejecutar red
         </button>
@@ -157,18 +163,31 @@
 
     <br />
 
-    <div class="TablaResultados">
+    <!-- IMAGENES MATRIZ CONFUSION-->
+    <h1 class="Jugadores" style="background-color: #a40fff;">Matriz de confusión</h1>
+    <div style="margin-left: 10%; display: flex;">
+      <img src="../static/Imagenes/MatrizConfusión.jpg" style="height: 55%; width: 40%;">
+      <img src="../static/ImagenesProcesadas/MatrizConfusión.jpg" style="height: 55%; width: 40%; margin-left: 2%;">
+    </div>
+    <br>
+
+    <!-- RESULTADO METRICAS -->
+    <h1 class="Jugadores" style="background-color: #fa2fa1;">Metricas de desempeño del modelo</h1>
+    <div style="margin-left: 10%; display: flex;">
+      <img src="../static/Imagenes/Metricas.jpg" style="height:65%; width: 80%;margin-left: 5%;">
+    </div>
+    <br />
+
+    <div class="Tabla2" style="margin-left: 16%;">
       <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col">#</th>
             <th scope="col">Fecha</th>
-            <th scope="col">Esp_Total</th>
-            <th scope="col">Esp_Disponible</th>
-            <th scope="col">%_EspUsado</th>
-            <th scope="col">%_Espacio</th>
-            <th scope="col">Memory_Total</th>
-            <th scope="col">User</th>
+            <th scope="col">Exactitud</th>
+            <th scope="col">Precision</th>
+            <th scope="col">Sencibilidad</th>
+            <th scope="col">F1</th>
           </tr>
         </thead>
         <tbody id="TablaInfoResultados">
@@ -217,6 +236,19 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+  <!-- CERRAR MODAL ALERTA -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const modal = document.getElementById('myModal');
+      const closeModalButton = document.getElementById('closeModalButton');
+      console.log(modal, closeModalButton);
+      function closeModal() {
+        console.log('Cerrar modal');
+        modal.classList.add('hidden');
+      }
+      closeModalButton.addEventListener('click', closeModal);
+    });
+  </script>
 </body>
 
 </html>
